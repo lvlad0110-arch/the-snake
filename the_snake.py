@@ -21,7 +21,7 @@ BOARD_BG = (0, 0, 0)
 
 
 class GameObject:
-    '''Инициализируем родитлельский край'''
+    """Инициализируем родитлельский край"""
 
     def __init__(self, color, x, y, width=20, height=20):
         self.color = color
@@ -31,12 +31,12 @@ class GameObject:
         self.height = height
 
     def draw(self):
-        '''передаем пустой метод отрисовки для дочерних классов'''
+        """передаем пустой метод отрисовки для дочерних классов"""
         pass
 
 
 class Snake(GameObject):
-    '''Класс, отвечающий за логику змейки'''
+    """Класс, отвечающий за логику змейки"""
 
     def __init__(self, color, x, y, width=20, height=20, direction=' '):
         super().__init__(color, x, y, width, height)
@@ -45,12 +45,12 @@ class Snake(GameObject):
         self.lenght = 1
 
     def draw(self):
-        '''Отрисовываем змейку'''
+        """Отрисовываем змейку"""
         for x, y in self.position:
             pygame.draw.rect(dis, self.color, (x, y, self.width, self.height))
 
     def move(self):
-        '''Метод изменяет direction, который определяет движение змейки'''
+        """Метод изменяет direction, который определяет движение змейки"""
         if self.direction == 'UP':
             self.y -= 20
         elif self.direction == 'DOWN':
@@ -61,10 +61,10 @@ class Snake(GameObject):
             self.x += 20
 
     def update_body(self):
-        '''
+        """
         Метод отвечает за увеличение змейки и останавливает
         ее бесконечный рост
-        '''
+        """
         # добавляем голову в начало списка
         self.position.insert(0, (self.x, self.y))
         # Удаляем последний сегмент (хвост), чтобы длина оставалась постоянной
@@ -72,7 +72,7 @@ class Snake(GameObject):
             self.position.pop()
 
     def border_transition(self):
-        '''Метод переносит голову змеюки через границу экрана'''
+        """Метод переносит голову змеюки через границу экрана"""
         # из максимальной ширины вычитается 10px, тк змейка может
         # застрять ровно на 640
         if self.x > SCREEN_WIDTH - 10:
@@ -87,11 +87,11 @@ class Snake(GameObject):
             self.y = SCREEN_HEIGHT
 
     def collision_check(self):
-        '''Метод проверяет столкновения'''
+        """Метод проверяет столкновения"""
         return (self.x, self.y) in self.position[1:]
 
     def snake_reset(self):
-        '''Метод отвечает за сброс игры и дает возможность выключить игру'''
+        """Метод отвечает за сброс игры и дает возможность выключить игру"""
         text = font.render('Сыграть еще? (y - да | n - нет)', True, TEXT_COL)
         rect_t = text.get_rect(center=(SCREEN_WIDTH // 2,
                                        SCREEN_HEIGHT // 2))
@@ -119,7 +119,7 @@ class Snake(GameObject):
 
 
 class Apple(GameObject):
-    '''Отвечает за генерирование яблок и их поедание'''
+    """Отвечает за генерирование яблок и их поедание"""
 
     def __init__(self, color, width=20, height=20):
         # выравниваем положения яблока по "сетке" поля, чтобы
@@ -129,7 +129,7 @@ class Apple(GameObject):
         self.y = randint(0, (SCREEN_HEIGHT // 20 - 1)) * 20
 
     def random_position(self, snake):
-        '''Генерирует случайные координаты для змейки'''
+        """Генерирует случайные координаты для змейки"""
         while True:
             self.x = randint(0, (SCREEN_WIDTH // 20 - 1)) * 20
             self.y = randint(0, (SCREEN_HEIGHT // 20 - 1)) * 20
@@ -138,19 +138,19 @@ class Apple(GameObject):
                 break
 
     def apple_draw(self):
-        '''Отрисовывает яблоки'''
+        """Отрисовывает яблоки"""
         pygame.draw.rect(dis, COLOR_APPLE,
                          (self.x, self.y, self.width, self.height))
 
     def apple_consume(self, snake):
-        '''При съедении яблока увеличивает длину змейки'''
+        """При съедении яблока увеличивает длину змейки"""
         if snake.position[0] == (self.x, self.y):
             snake.lenght += 1
             return True
 
 
 def handle_keys(snake):
-    '''Обрабатывает нажатия на клавиатуру для управления'''
+    """Обрабатывает нажатия на клавиатуру для управления"""
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
@@ -167,7 +167,7 @@ def handle_keys(snake):
 
 
 def main():
-    '''Запускает основной цикл игры'''
+    """Запускает основной цикл игры"""
     # Инициализация PyGame:
     pygame.init()
     pygame.font.init()
