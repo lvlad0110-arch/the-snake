@@ -4,7 +4,7 @@ pygame.init()
 
 
 def handle_keys(snake):
-    '''Обрабатывает нажатия на клавиатуру для управления'''
+    """Обрабатывает нажатия на клавиатуру для управления"""
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()

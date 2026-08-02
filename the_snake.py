@@ -8,7 +8,7 @@ from parts.snake import Snake
 
 
 def main():
-    '''Запускает основной цикл игры'''
+    """Запускает основной цикл игры"""
     # Инициализация PyGame:
     pygame.init()
     pygame.font.init()
