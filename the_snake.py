@@ -1,13 +1,14 @@
 import pygame
+
 import parts.settings as sett
 from parts import constants as const
-from parts.snake import Snake
-from parts.movement import handle_keys as movement
 from parts.apple import Apple
+from parts.movement import handle_keys as movement
+from parts.snake import Snake
 
 
 def main():
-    """Запускает основной цикл игры"""
+    '''Запускает основной цикл игры'''
     # Инициализация PyGame:
     pygame.init()
     pygame.font.init()

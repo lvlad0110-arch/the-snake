@@ -1,4 +1,5 @@
 import pygame
+
 import parts.constants as const
 
 pygame.init()

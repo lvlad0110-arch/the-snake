@@ -1,11 +1,12 @@
 import pygame
+
 import parts.constants as const
 import parts.settings as sett
 from parts.GameObject import GameObject
 
 
 class Snake(GameObject):
-    """Класс, отвечающий за логику змейки"""
+    '''Класс, отвечающий за логику змейки'''
 
     def __init__(self, color, x, y, width=20, height=20, direction=' '):
         super().__init__(color, x, y, width, height)
@@ -14,16 +15,16 @@ class Snake(GameObject):
         self.lenght = 1
 
     def draw(self):
-        """Отрисовываем змейку"""
+        '''Отрисовываем змейку'''
         for x, y in self.body:
             pygame.draw.rect(sett.dis, self.color,
                              (x, y, self.width, self.height))
 
     def move(self):
-        """
+        '''
         Метод изменяет direction, который определяет
         движение змейки
-        """
+        '''
         if self.direction == 'UP':
             self.y -= 20
         elif self.direction == 'DOWN':
@@ -34,9 +35,10 @@ class Snake(GameObject):
             self.x += 20
 
     def update_body(self):
-        """Метод отвечает за увеличение змейки и останавливает
+        '''
+        Метод отвечает за увеличение змейки и останавливает
         ее бесконечный рост
-        """
+        '''
         self.body.insert(0, (self.x, self.y))
         # Удаляем последний сегмент (хвост), чтобы длина
         # оставалась постоянной
@@ -44,7 +46,7 @@ class Snake(GameObject):
             self.body.pop()
 
     def border_transition(self):
-        """Метод переносит голову змеюки через границу экрана"""
+        '''Метод переносит голову змеюки через границу экрана'''
         # из максимальной ширины вычитается 10px, тк змейка может
         # застрять ровно на 640
         if self.x > const.SCREEN_WIDTH - 10:
@@ -59,14 +61,12 @@ class Snake(GameObject):
             self.y = const.SCREEN_HEIGHT
 
     def collision_check(self):
-        """Метод проверяет столкновения"""
-        if (self.x, self.y) in self.body[1:]:
-            return True
-        return False
+        '''Метод проверяет столкновения'''
+        return (self.x, self.y) in self.body[1:]
 
     def snake_reset(self):
-        """Метод отвечает за сброс игры и дает возможность выключить игру"""
-        text = sett.font.render("Сыграть еще? (y - да | n - нет)",
+        '''Метод отвечает за сброс игры и дает возможность выключить игру'''
+        text = sett.font.render('Сыграть еще? (y - да | n - нет)',
                                 True, const.TEXT_COL)
         rect_t = text.get_rect(center=(const.SCREEN_WIDTH // 2,
                                        const.SCREEN_HEIGHT // 2))
@@ -77,17 +77,17 @@ class Snake(GameObject):
 
             while True:
                 for event in pygame.event.get():
-                    if event.type == pygame.KEYDOWN:
-                        if event.type == pygame.QUIT:
-                            pygame.quit()
-                            raise SystemExit
-                    elif event.key == pygame.K_y:
-                        self.x = const.SCREEN_WIDTH // 2
-                        self.y = const.SCREEN_HEIGHT // 2
-                        self.body = [(self.x, self.y)]
-                        self.lenght = 1
-                        self.direction = ' '
-                        return
-                    elif event.key == pygame.K_n:
+                    if event.type == pygame.QUIT:
                         pygame.quit()
                         raise SystemExit
+                    if event.type == pygame.KEYDOWN:
+                        if event.key == pygame.K_y:
+                            self.x = const.SCREEN_WIDTH // 2
+                            self.y = const.SCREEN_HEIGHT // 2
+                            self.body = [(self.x, self.y)]
+                            self.lenght = 1
+                            self.direction = ' '
+                            return
+                        elif event.key == pygame.K_n:
+                            pygame.quit()
+                            raise SystemExit
