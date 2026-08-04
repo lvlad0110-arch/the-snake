@@ -16,6 +16,7 @@ UP = (0, -1)
 DOWN = (0, 1)
 LEFT = (-1, 0)
 RIGHT = (1, 0)
+
 OPPOSITE_DIRECTION = {
     UP: DOWN,
     DOWN: UP,
@@ -84,26 +85,14 @@ class Snake(GameObject):
             dx, dy = self.direction
             self.x += dx * GRID_SIZE
             self.y += dy * GRID_SIZE
+            # Переносит голову змейки через границу экрана
+            self.x %= SCREEN_WIDTH
+            self.y %= SCREEN_HEIGHT
 
-    def update_body(self):
-        """
-        Метод отвечает за увеличение змейки и останавливает
-        ее бесконечный рост
-        """
+        # Отвечает за увеличение змейки и останавливает ее бесконечный рост
         self.positions.insert(0, (self.x, self.y))
         if len(self.positions) > self.length:
             self.positions.pop()
-
-    def border_transition(self):
-        """Метод переносит голову змейки через границу экрана"""
-        if self.x >= SCREEN_WIDTH:
-            self.x = 0
-        elif self.x < 0:
-            self.x = SCREEN_WIDTH - GRID_SIZE
-        elif self.y >= SCREEN_HEIGHT:
-            self.y = 0
-        elif self.y < 0:
-            self.y = SCREEN_HEIGHT - GRID_SIZE
 
     def collision_check(self):
         """Метод проверяет столкновения"""
@@ -195,8 +184,6 @@ def main():
         clock.tick(SPEED)
         handle_keys(snake)
         snake.move()
-        snake.border_transition()
-        snake.update_body()
         screen.fill(BOARD_BACKGROUND_COLOR)
         if apple.apple_consume(snake):
             apple.randomize_position(snake)
