@@ -46,8 +46,10 @@ class GameObject:
         self.height = GRID_SIZE
 
     def draw(self):
-        """передаем пустой метод отрисовки для дочерних классов"""
-        pass
+        """Передаем метод для дочерних классов"""
+        raise NotImplementedError(
+            'Метод draw() должен быть переопределён.'
+        )
 
 
 class Snake(GameObject):
@@ -98,8 +100,8 @@ class Apple(GameObject):
 
     def __init__(self, body_color):
         super().__init__(body_color)
-        self.x = randint(0, SCREEN_WIDTH // GRID_SIZE - 1) * GRID_SIZE
-        self.y = randint(0, SCREEN_HEIGHT // GRID_SIZE - 1) * GRID_SIZE
+        self.x = 0
+        self.y = 0
         self.position = (self.x, self.y)
 
     def randomize_position(self, snake):
@@ -173,28 +175,28 @@ def main():
     # Создаем экземпляры яблока и змеи
     snake = Snake(COLOR_SNAKE)
     apple = Apple(COLOR_APPLE)
+    apple.randomize_position(snake)
 
     def collision_check():
         # Функция проверяет столкновения
-        return (snake.x, snake.y) in snake.positions[1:]
+        return snake.get_head_position() in snake.positions[1:]
 
-    running = True
-    while running:
+    while True:
         clock.tick(SPEED)
         handle_keys(snake)
         snake.move()
         # При съедении яблока увеличивает длину змейки
         # В замечании строки 168 в в.1 проекта указано перенести в мув
         # но у яблока мув нет. Если не плодить функции, то лучше так навреное
+        screen.fill(BOARD_BACKGROUND_COLOR)
         if snake.get_head_position() == apple.position:
             snake.length += 1
             apple.randomize_position(snake)
-        screen.fill(BOARD_BACKGROUND_COLOR)
+        elif collision_check():
+            reset(snake)
         apple.draw()
         snake.draw()
         pygame.display.update()
-        if collision_check():
-            reset(snake)
 
 
 if __name__ == '__main__':
