@@ -183,7 +183,11 @@ def main():
         clock.tick(SPEED)
         handle_keys(snake)
         snake.move()
-        if apple.apple_consume(snake):
+        # При съедении яблока увеличивает длину змейки
+        # В замечании строки 168 в в.1 проекта указано перенести в мув
+        # но у яблока мув нет. Если не плодить функции, то лучше так навреное
+        if snake.get_head_position() == apple.position:
+            snake.length += 1
             apple.randomize_position(snake)
         screen.fill(BOARD_BACKGROUND_COLOR)
         apple.draw()
