@@ -40,10 +40,11 @@ DEF_COLOR = (0, 0, 0)
 class GameObject:
     """Инициализируем родительский класс"""
 
-    def __init__(self, body_color):
+    def __init__(self, body_color=DEF_COLOR):
         self.body_color = body_color
         self.width = GRID_SIZE
         self.height = GRID_SIZE
+        self.position = (0, 0)
 
     def draw(self):
         """Передаем метод для дочерних классов"""
@@ -55,7 +56,7 @@ class GameObject:
 class Snake(GameObject):
     """Класс, отвечающий за логику змейки"""
 
-    def __init__(self, body_color, direction=' '):
+    def __init__(self, body_color=DEF_COLOR, direction=' '):
         super().__init__(body_color)
         self.x = SCREEN_WIDTH // 2
         self.y = SCREEN_HEIGHT // 2
@@ -94,11 +95,19 @@ class Snake(GameObject):
         if len(self.positions) > self.length:
             self.positions.pop()
 
+    def reset(self):
+        """Сбрасывает состояние змейки"""
+        self.x = SCREEN_WIDTH // 2
+        self.y = SCREEN_HEIGHT // 2
+        self.length = 1
+        self.positions = [(self.x, self.y)]
+        self.direction = ' '
+
 
 class Apple(GameObject):
     """Отвечает за генерирование яблок и их поедание"""
 
-    def __init__(self, body_color):
+    def __init__(self, body_color=DEF_COLOR):
         super().__init__(body_color)
         self.x = 0
         self.y = 0
@@ -144,7 +153,7 @@ def handle_keys(snake):
                 snake.update_direction(RIGHT)
 
 
-def reset(snake):
+def game_over(snake):
     """Функция отвечает за сброс игры и дает возможность выключить игру"""
     text = font.render('Сыграть еще? (y - да | n - нет)', True, TEXT_COL)
     rect_t = text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2))
@@ -159,11 +168,7 @@ def reset(snake):
                 raise SystemExit
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_y:
-                    snake.x = SCREEN_WIDTH // 2
-                    snake.y = SCREEN_HEIGHT // 2
-                    snake.length = 1
-                    snake.positions = [(snake.x, snake.y)]
-                    snake.direction = ' '
+                    snake.reset()
                     return
                 elif event.key == pygame.K_n:
                     pygame.quit()
@@ -193,7 +198,7 @@ def main():
             snake.length += 1
             apple.randomize_position(snake)
         elif collision_check():
-            reset(snake)
+            game_over(snake)
         apple.draw()
         snake.draw()
         pygame.display.update()
