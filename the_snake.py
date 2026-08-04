@@ -42,8 +42,6 @@ class GameObject:
 
     def __init__(self, body_color):
         self.body_color = body_color
-        self.x = 0
-        self.y = 0
         self.width = GRID_SIZE
         self.height = GRID_SIZE
 
@@ -99,18 +97,20 @@ class Apple(GameObject):
     """Отвечает за генерирование яблок и их поедание"""
 
     def __init__(self, body_color):
-        super().__init__(body_color,)
+        super().__init__(body_color)
+        self.x = randint(0, SCREEN_WIDTH // GRID_SIZE - 1) * GRID_SIZE
+        self.y = randint(0, SCREEN_HEIGHT // GRID_SIZE - 1) * GRID_SIZE
         self.position = (self.x, self.y)
 
     def randomize_position(self, snake):
         """Генерирует случайные координаты для яблока"""
-        while True:
+        self.x, self.y = snake.positions[0]
+
+        while (self.x, self.y) in snake.positions:
             self.x = randint(0, (SCREEN_WIDTH // GRID_SIZE - 1)) * GRID_SIZE
             self.y = randint(0, (SCREEN_HEIGHT // GRID_SIZE - 1)) * GRID_SIZE
-            self.position = (self.x, self.y)
 
-            if (self.x, self.y) not in snake.positions:
-                break
+        self.position = (self.x, self.y)
 
     def draw(self):
         """Отрисовывает яблоки"""
@@ -183,9 +183,9 @@ def main():
         clock.tick(SPEED)
         handle_keys(snake)
         snake.move()
-        screen.fill(BOARD_BACKGROUND_COLOR)
         if apple.apple_consume(snake):
             apple.randomize_position(snake)
+        screen.fill(BOARD_BACKGROUND_COLOR)
         apple.draw()
         snake.draw()
         pygame.display.update()
