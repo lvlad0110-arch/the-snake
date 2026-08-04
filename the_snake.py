@@ -12,10 +12,17 @@ GRID_SIZE = 20
 GRID_WIDTH = SCREEN_WIDTH // GRID_SIZE
 GRID_HEIGHT = SCREEN_HEIGHT // GRID_SIZE
 
-UP = 'UP'
-DOWN = 'DOWN'
-LEFT = 'LEFT'
-RIGHT = 'RIGHT'
+UP = (1, 0)
+DOWN = (-1, 0)
+LEFT = (0, 1)
+RIGHT = (0, -1)
+OPPOSITE_DIRECTION = {
+    UP: DOWN,
+    DOWN: UP,
+    LEFT: RIGHT,
+    RIGHT: LEFT
+}
+
 
 SPEED = 10
 clock = pygame.time.Clock()
@@ -26,13 +33,14 @@ COLOR_SNAKE = (0, 255, 0)
 COLOR_APPLE = (255, 0, 0)
 TEXT_COL = (255, 255, 255)
 BOARD_BACKGROUND_COLOR = (0, 0, 0)
+DEF_COLOR = (0, 0, 0)
 
 
 class GameObject:
     """Инициализируем родительский класс"""
 
-    def __init__(self, body_color=(0, 0, 0), x=0, y=0, width=20, height=20):
-        self.body_color = body_color
+    def __init__(self, DEF_COLOR, x=0, y=0, width=20, height=20):
+        self.body_color = DEF_COLOR
         self.position = (x, y)
         self.x = x
         self.y = y
@@ -57,22 +65,16 @@ class Snake(GameObject):
     def update_direction(self, new_direction):
         """Обновляет направление движения змейки"""
         # Проверяем, чтобы змейка не могла повернуть на 180 градусов
-        opposite_directions = {
-            UP: DOWN,
-            DOWN: UP,
-            LEFT: RIGHT,
-            RIGHT: LEFT
-        }
 
         # Если новое направление не противоположно текущему, обновляем
-        if new_direction != opposite_directions.get(self.direction):
+        if new_direction != OPPOSITE_DIRECTION.get(self.direction):
             self.direction = new_direction
 
     def draw(self):
         """Отрисовываем змейку"""
-        for x, y in self.positions:
+        for axisX, axisY in self.positions:
             pygame.draw.rect(screen, self.body_color,
-                             (x, y, self.width, self.height))
+                             (axisX, axisY, self.width, self.height))
 
     def get_head_position(self):
         """Возвращает позицию головы змейки"""
