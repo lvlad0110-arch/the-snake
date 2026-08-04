@@ -94,37 +94,6 @@ class Snake(GameObject):
         if len(self.positions) > self.length:
             self.positions.pop()
 
-    def collision_check(self):
-        """Метод проверяет столкновения"""
-        return (self.x, self.y) in self.positions[1:]
-
-    def reset(self):
-        """Метод отвечает за сброс игры и дает возможность выключить игру"""
-        text = font.render('Сыграть еще? (y - да | n - нет)', True, TEXT_COL)
-        rect_t = text.get_rect(center=(SCREEN_WIDTH // 2,
-                                       SCREEN_HEIGHT // 2))
-        if self.collision_check():
-            screen.fill(BOARD_BACKGROUND_COLOR)
-            screen.blit(text, rect_t)
-            pygame.display.update()
-
-            while True:
-                for event in pygame.event.get():
-                    if event.type == pygame.QUIT:
-                        pygame.quit()
-                        raise SystemExit
-                    if event.type == pygame.KEYDOWN:
-                        if event.key == pygame.K_y:
-                            self.x = SCREEN_WIDTH // 2
-                            self.y = SCREEN_HEIGHT // 2
-                            self.positions = [(self.x, self.y)]
-                            self.length = 1
-                            self.direction = ' '
-                            return
-                        elif event.key == pygame.K_n:
-                            pygame.quit()
-                            raise SystemExit
-
 
 class Apple(GameObject):
     """Отвечает за генерирование яблок и их поедание"""
@@ -173,11 +142,41 @@ def handle_keys(snake):
                 snake.update_direction(RIGHT)
 
 
+def reset(snake):
+    """Функция отвечает за сброс игры и дает возможность выключить игру"""
+    text = font.render('Сыграть еще? (y - да | n - нет)', True, TEXT_COL)
+    rect_t = text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2))
+    screen.fill(BOARD_BACKGROUND_COLOR)
+    screen.blit(text, rect_t)
+    pygame.display.update()
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                raise SystemExit
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_y:
+                    snake.x = SCREEN_WIDTH // 2
+                    snake.y = SCREEN_HEIGHT // 2
+                    snake.length = 1
+                    snake.positions = [(snake.x, snake.y)]
+                    snake.direction = ' '
+                    return
+                elif event.key == pygame.K_n:
+                    pygame.quit()
+                    raise SystemExit
+
+
 def main():
     """Запускает основной цикл игры"""
     # Создаем экземпляры яблока и змеи
     snake = Snake(COLOR_SNAKE)
     apple = Apple(COLOR_APPLE)
+
+    def collision_check():
+        # Функция проверяет столкновения
+        return (snake.x, snake.y) in snake.positions[1:]
 
     running = True
     while running:
@@ -190,8 +189,8 @@ def main():
         apple.draw()
         snake.draw()
         pygame.display.update()
-        if snake.collision_check():
-            snake.reset()
+        if collision_check():
+            reset(snake)
 
 
 if __name__ == '__main__':
