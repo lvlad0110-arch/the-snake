@@ -12,6 +12,9 @@ GRID_SIZE = 20
 GRID_WIDTH = SCREEN_WIDTH // GRID_SIZE
 GRID_HEIGHT = SCREEN_HEIGHT // GRID_SIZE
 
+START_POSITION = (SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
+DEF_POSITION = (0, 0)
+
 UP = (0, -1)
 DOWN = (0, 1)
 LEFT = (-1, 0)
@@ -42,9 +45,7 @@ class GameObject:
 
     def __init__(self, body_color=DEF_COLOR):
         self.body_color = body_color
-        self.width = GRID_SIZE
-        self.height = GRID_SIZE
-        self.position = (0, 0)
+        self.position = DEF_POSITION
 
     def draw(self):
         """Передаем метод для дочерних классов"""
@@ -56,10 +57,10 @@ class GameObject:
 class Snake(GameObject):
     """Класс, отвечающий за логику змейки"""
 
-    def __init__(self, body_color=DEF_COLOR, direction=' '):
+    def __init__(self, body_color=DEF_COLOR, direction=None):
         super().__init__(body_color)
-        self.x = SCREEN_WIDTH // 2
-        self.y = SCREEN_HEIGHT // 2
+        self.x, self.y = START_POSITION
+        self.position = START_POSITION
         self.direction = direction
         self.positions = [(self.x, self.y)]
         self.length = 1
@@ -72,17 +73,17 @@ class Snake(GameObject):
 
     def draw(self):
         """Отрисовываем змейку"""
-        for axisX, axisY in self.positions:
+        for axis_x, axis_y in self.positions:
             pygame.draw.rect(screen, self.body_color,
-                             (axisX, axisY, self.width, self.height))
+                             (axis_x, axis_y, GRID_SIZE, GRID_SIZE))
 
     def get_head_position(self):
         """Возвращает позицию головы змейки"""
-        return self.positions[0] if self.positions else (self.x, self.y)
+        return self.position
 
     def move(self):
         """Метод изменяет direction, который определяет движение змейки"""
-        if self.direction != ' ':
+        if self.direction is not None:
             dx, dy = self.direction
             self.x += dx * GRID_SIZE
             self.y += dy * GRID_SIZE
@@ -90,18 +91,19 @@ class Snake(GameObject):
             self.x %= SCREEN_WIDTH
             self.y %= SCREEN_HEIGHT
 
+            self.position = (self.x, self.y)
         # Отвечает за увеличение змейки и останавливает ее бесконечный рост
-        self.positions.insert(0, (self.x, self.y))
+        self.positions.insert(0, self.position)
         if len(self.positions) > self.length:
             self.positions.pop()
 
     def reset(self):
         """Сбрасывает состояние змейки"""
-        self.x = SCREEN_WIDTH // 2
-        self.y = SCREEN_HEIGHT // 2
+        self.x, self.y = START_POSITION
+        self.position = START_POSITION
         self.length = 1
-        self.positions = [(self.x, self.y)]
-        self.direction = ' '
+        self.positions = [START_POSITION]
+        self.direction = None
 
 
 class Apple(GameObject):
@@ -109,24 +111,26 @@ class Apple(GameObject):
 
     def __init__(self, body_color=DEF_COLOR):
         super().__init__(body_color)
-        self.x = 0
-        self.y = 0
-        self.position = (self.x, self.y)
+        self.position = (
+            randint(0, GRID_WIDTH - 1) * GRID_SIZE,
+            randint(0, GRID_HEIGHT - 1) * GRID_SIZE
+        )
+        self.x, self.y = self.position
 
     def randomize_position(self, snake):
-        """Генерирует случайные координаты для яблока"""
-        self.x, self.y = snake.positions[0]
+        """Генерирует случайную позицию яблока."""
+        while self.position in snake.positions:
+            self.position = (
+                randint(0, GRID_WIDTH - 1) * GRID_SIZE,
+                randint(0, GRID_HEIGHT - 1) * GRID_SIZE
+            )
 
-        while (self.x, self.y) in snake.positions:
-            self.x = randint(0, (SCREEN_WIDTH // GRID_SIZE - 1)) * GRID_SIZE
-            self.y = randint(0, (SCREEN_HEIGHT // GRID_SIZE - 1)) * GRID_SIZE
-
-        self.position = (self.x, self.y)
+        self.x, self.y = self.position
 
     def draw(self):
         """Отрисовывает яблоки"""
         pygame.draw.rect(screen, self.body_color,
-                         (self.x, self.y, self.width, self.height))
+                         (self.x, self.y, GRID_SIZE, GRID_SIZE))
 
 
 def handle_keys(snake):
@@ -180,8 +184,6 @@ def main():
         handle_keys(snake)
         snake.move()
         # При съедении яблока увеличивает длину змейки
-        # В замечании строки 168 в в.1 проекта указано перенести в мув
-        # но у яблока мув нет. Если не плодить функции, то лучше так навреное
         screen.fill(BOARD_BACKGROUND_COLOR)
         if snake.get_head_position() == apple.position:
             snake.length += 1
