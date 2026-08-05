@@ -128,13 +128,6 @@ class Apple(GameObject):
         pygame.draw.rect(screen, self.body_color,
                          (self.x, self.y, self.width, self.height))
 
-    def apple_consume(self, snake):
-        """При съедении яблока увеличивает длину змейки"""
-        if snake.positions[0] == (self.x, self.y):
-            snake.length += 1
-            return True
-        return False
-
 
 def handle_keys(snake):
     """Обрабатывает нажатия на клавиатуру для управления"""
