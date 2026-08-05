@@ -182,10 +182,6 @@ def main():
     apple = Apple(COLOR_APPLE)
     apple.randomize_position(snake)
 
-    def collision_check():
-        # Функция проверяет столкновения
-        return snake.get_head_position() in snake.positions[1:]
-
     while True:
         clock.tick(SPEED)
         handle_keys(snake)
@@ -197,7 +193,7 @@ def main():
         if snake.get_head_position() == apple.position:
             snake.length += 1
             apple.randomize_position(snake)
-        elif collision_check():
+        elif snake.get_head_position() in snake.positions[1:]:
             game_over(snake)
         apple.draw()
         snake.draw()
