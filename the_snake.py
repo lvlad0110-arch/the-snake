@@ -13,7 +13,7 @@ GRID_WIDTH = SCREEN_WIDTH // GRID_SIZE
 GRID_HEIGHT = SCREEN_HEIGHT // GRID_SIZE
 
 START_POSITION = (SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
-DEF_POSITION = (0, 0)
+DEFAULT_POSITION = (0, 0)
 
 UP = (0, -1)
 DOWN = (0, 1)
@@ -45,7 +45,7 @@ class GameObject:
 
     def __init__(self, body_color=DEF_COLOR):
         self.body_color = body_color
-        self.position = DEF_POSITION
+        self.position = DEFAULT_POSITION
 
     def draw(self):
         """Передаем метод для дочерних классов"""
@@ -59,10 +59,9 @@ class Snake(GameObject):
 
     def __init__(self, body_color=DEF_COLOR, direction=None):
         super().__init__(body_color)
-        self.x, self.y = START_POSITION
         self.position = START_POSITION
         self.direction = direction
-        self.positions = [(self.x, self.y)]
+        self.positions = [self.position]
         self.length = 1
 
     def update_direction(self, new_direction):
@@ -82,27 +81,27 @@ class Snake(GameObject):
         return self.position
 
     def move(self):
-        """Метод изменяет direction, который определяет движение змейки"""
+        """Двигает змейку"""
         if self.direction is not None:
-            dx, dy = self.direction
-            self.x += dx * GRID_SIZE
-            self.y += dy * GRID_SIZE
-            # Переносит голову змейки через границу экрана
-            self.x %= SCREEN_WIDTH
-            self.y %= SCREEN_HEIGHT
+            direction_x, direction_y = self.direction
 
-            self.position = (self.x, self.y)
-        # Отвечает за увеличение змейки и останавливает ее бесконечный рост
+            x, y = self.position
+
+            x = (x + direction_x * GRID_SIZE) % SCREEN_WIDTH
+            y = (y + direction_y * GRID_SIZE) % SCREEN_HEIGHT
+
+            self.position = (x, y)
+
         self.positions.insert(0, self.position)
+
         if len(self.positions) > self.length:
             self.positions.pop()
 
     def reset(self):
         """Сбрасывает состояние змейки"""
-        self.x, self.y = START_POSITION
         self.position = START_POSITION
         self.length = 1
-        self.positions = [START_POSITION]
+        self.positions = [self.position]
         self.direction = None
 
 
@@ -111,11 +110,7 @@ class Apple(GameObject):
 
     def __init__(self, body_color=DEF_COLOR):
         super().__init__(body_color)
-        self.position = (
-            randint(0, GRID_WIDTH - 1) * GRID_SIZE,
-            randint(0, GRID_HEIGHT - 1) * GRID_SIZE
-        )
-        self.x, self.y = self.position
+        self.position = START_POSITION
 
     def randomize_position(self, snake):
         """Генерирует случайную позицию яблока."""
@@ -125,20 +120,17 @@ class Apple(GameObject):
                 randint(0, GRID_HEIGHT - 1) * GRID_SIZE
             )
 
-        self.x, self.y = self.position
-
     def draw(self):
         """Отрисовывает яблоки"""
         pygame.draw.rect(screen, self.body_color,
-                         (self.x, self.y, GRID_SIZE, GRID_SIZE))
+                         (*self.position, GRID_SIZE, GRID_SIZE))
 
 
 def handle_keys(snake):
     """Обрабатывает нажатия на клавиатуру для управления"""
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            pygame.quit()
-            raise SystemExit
+            terminate()
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_UP:
                 snake.update_direction(UP)
@@ -148,6 +140,12 @@ def handle_keys(snake):
                 snake.update_direction(LEFT)
             elif event.key == pygame.K_RIGHT:
                 snake.update_direction(RIGHT)
+
+
+def terminate():
+    """Функция вызывает выход из игры"""
+    pygame.quit()
+    raise SystemExit
 
 
 def game_over(snake):
@@ -161,15 +159,13 @@ def game_over(snake):
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                pygame.quit()
-                raise SystemExit
+                terminate()
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_y:
                     snake.reset()
                     return
                 elif event.key == pygame.K_n:
-                    pygame.quit()
-                    raise SystemExit
+                    terminate()
 
 
 def main():
@@ -190,6 +186,7 @@ def main():
             apple.randomize_position(snake)
         elif snake.get_head_position() in snake.positions[1:]:
             game_over(snake)
+            apple.randomize_position(snake)
         apple.draw()
         snake.draw()
         pygame.display.update()
