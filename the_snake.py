@@ -37,13 +37,13 @@ COLOR_SNAKE = (0, 255, 0)
 COLOR_APPLE = (255, 0, 0)
 TEXT_COL = (255, 255, 255)
 BOARD_BACKGROUND_COLOR = (0, 0, 0)
-DEF_COLOR = (0, 0, 0)
+DEFAULT_COLOR = (0, 0, 0)
 
 
 class GameObject:
     """Инициализируем родительский класс"""
 
-    def __init__(self, body_color=DEF_COLOR):
+    def __init__(self, body_color=DEFAULT_COLOR):
         self.body_color = body_color
         self.position = DEFAULT_POSITION
 
@@ -57,9 +57,9 @@ class GameObject:
 class Snake(GameObject):
     """Класс, отвечающий за логику змейки"""
 
-    def __init__(self, body_color=DEF_COLOR, direction=None):
+    def __init__(self, body_color=DEFAULT_COLOR, direction=None):
         super().__init__(body_color)
-        self.position = START_POSITION
+        self.position = self.reset()
         self.direction = direction
         self.positions = [self.position]
         self.length = 1
@@ -84,13 +84,10 @@ class Snake(GameObject):
         """Двигает змейку"""
         if self.direction is not None:
             direction_x, direction_y = self.direction
-
-            x, y = self.position
-
-            x = (x + direction_x * GRID_SIZE) % SCREEN_WIDTH
-            y = (y + direction_y * GRID_SIZE) % SCREEN_HEIGHT
-
-            self.position = (x, y)
+            location_x, location_y = self.position
+            location_x = (location_x + direction_x * GRID_SIZE) % SCREEN_WIDTH
+            location_y = (location_y + direction_y * GRID_SIZE) % SCREEN_HEIGHT
+            self.position = (location_x, location_y)
 
         self.positions.insert(0, self.position)
 
@@ -108,7 +105,7 @@ class Snake(GameObject):
 class Apple(GameObject):
     """Отвечает за генерирование яблок и их поедание"""
 
-    def __init__(self, body_color=DEF_COLOR):
+    def __init__(self, body_color=DEFAULT_COLOR):
         super().__init__(body_color)
         self.position = START_POSITION
 
