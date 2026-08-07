@@ -59,7 +59,7 @@ class Snake(GameObject):
 
     def __init__(self, body_color=DEFAULT_COLOR, direction=None):
         super().__init__(body_color)
-        self.position = self.reset()
+        self.reset()
         self.direction = direction
         self.positions = [self.position]
         self.length = 1
